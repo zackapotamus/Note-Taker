@@ -14,7 +14,7 @@ class JsonDb {
         });
     }
     insert(objectToInsert) {
-        if (!objectToInsert.hasOwnProperty("id")) objectToInsert.id = Date().now().toString();
+        if (!objectToInsert.hasOwnProperty("id")) objectToInsert.id = Date.now().toString();
         this.parsed.push(objectToInsert);
         this.stringified = JSON.stringify(this.parsed);
         this.writeToDb();
