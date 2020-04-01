@@ -5,13 +5,15 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "nodemon server.js",
-    "start": "node server.js"
+    "watch": "nodemon -r esm server.js",
+    "start": "node -r esm server.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.16.4"
+    "esm": "^3.2.25",
+    "express": "^4.16.4",
+    "uuid": "^7.0.3"
   },
   "devDependencies": {
     "nodemon": "^2.0.2"
