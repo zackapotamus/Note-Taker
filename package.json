@@ -1,19 +1,24 @@
 {
   "name": "note-taker",
   "version": "1.0.0",
-  "description": "",
-  "main": "server.js",
+  "description": "An application that can be used to write, save, and delete notes.",
+  "main": "JsonDb.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "nodemon server.js",
     "start": "node server.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zackapotamus/Note-Taker.git"
+  },
+  "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "express": "^4.16.4"
+  "bugs": {
+    "url": "https://github.com/zackapotamus/Note-Taker/issues"
   },
-  "devDependencies": {
-    "nodemon": "^2.0.2"
+  "homepage": "https://github.com/zackapotamus/Note-Taker#readme",
+  "dependencies": {
+    "express": "^4.17.1"
   }
 }
