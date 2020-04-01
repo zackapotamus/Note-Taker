@@ -1,7 +1,7 @@
 // Dependencies
 const express = require("express");
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const path = require("path");
 const PUBLIC_DIR = path.resolve("public");
 const JsonDb = require("./JsonDb.js");
