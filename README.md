@@ -17,6 +17,8 @@ This app allows you to write, save, and delete notes. It uses an express backend
 
 * [Tests](#tests)
 
+* [Links](#links)
+
 * [Questions](#questions)
 
 ## Installation
@@ -47,9 +49,15 @@ To run tests, please run the following command:
 N/A
 ```
 
+## Links
+
+* [Github Repository](https://github.com/zackapotamus/Note-Taker)
+
+* [Heroku Hosted Page](https://banana-sundae-38563.herokuapp.com/notes)
+
 ## Questions
 
 <img src="https://avatars3.githubusercontent.com/u/28291062?v=4" alt="avatar" style="border-radius: 16px;" width="30" />
 
-If you have any questions about the repo, open an issue or contact [zackapotamus](https://api.github.com/users/zackapotamus) at[zack.hayden@gmail.com](mailto:zack.hayden@gmail.com).
+If you have any questions about the repo, open an issue or contact [zackapotamus](https://api.github.com/users/zackapotamus) at [zack.hayden@gmail.com](mailto:zack.hayden@gmail.com).
 
