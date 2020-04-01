@@ -1,11 +1,11 @@
 // Dependencies
 const express = require("express");
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const path = require("path");
-const PUBLIC_DIR = path.resolve("public");
+const PUBLIC_DIR = path.join(__dirname, "public");
 const JsonDb = require("./JsonDb.js");
-// import { JsonDb } from './JsonDb.js';
+
 // Sets up the Express app to handle data parsing
 app.use('/', express.static(PUBLIC_DIR));
 app.use('/assets/css', express.static(PUBLIC_DIR));
@@ -32,13 +32,6 @@ function buildHtmlSend(pageName) {
 
 const foo = {"one": 1, "two": 2, "three": 3};
 
-function buildJsonSend() {
-    return [JSON.stringify(foo), {
-        headers: {
-            "Content-Type": "application/json; charset=utf-8"
-        }
-    }];
-}
 // Routes
 
 // Static HTML Files
@@ -65,7 +58,6 @@ app.post("/api/notes", (req, res) => {
 });
 
 app.delete("/api/notes/:id", (req, res) => {
-    console.log(req.params);
     try {
         jsonDb.delete(req.params.id);
     } catch (err) {
