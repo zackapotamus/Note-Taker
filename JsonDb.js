@@ -1,7 +1,4 @@
 const fs = require("fs");
-import { v4 as uuidv4 } from 'uuid';
-// import uuid from 'uuid';
-// const { v4 } = uuid;
 class JsonDb {
     constructor(fullPathToJson) {
         this.path = fullPathToJson;
@@ -17,7 +14,7 @@ class JsonDb {
         });
     }
     insert(objectToInsert) {
-        if (!objectToInsert.hasOwnProperty("id")) objectToInsert.id = uuidv4();
+        if (!objectToInsert.hasOwnProperty("id")) objectToInsert.id = Date().now().toString();
         this.parsed.push(objectToInsert);
         this.stringified = JSON.stringify(this.parsed);
         this.writeToDb();
@@ -41,4 +38,3 @@ class JsonDb {
 }
 
 module.exports = JsonDb;
-export {JsonDb};

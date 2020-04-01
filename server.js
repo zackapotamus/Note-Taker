@@ -5,7 +5,7 @@ const PORT = process.env.PORT || 3000;
 const path = require("path");
 const PUBLIC_DIR = path.resolve("public");
 const JsonDb = require("./JsonDb.js");
-// import { JsonDb } from './JsonDb.js';
+
 // Sets up the Express app to handle data parsing
 app.use('/', express.static(PUBLIC_DIR));
 app.use('/assets/css', express.static(PUBLIC_DIR));
