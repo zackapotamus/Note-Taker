@@ -1,14 +1,36 @@
-var $noteTitle = $(".note-title");
-var $noteText = $(".note-textarea");
-var $saveNoteBtn = $(".save-note");
-var $newNoteBtn = $(".new-note");
-var $noteList = $(".list-container .list-group");
+const $noteTitle = $(".note-title");
+const $noteText = $(".note-textarea");
+const $saveNoteBtn = $(".save-note");
+const $newNoteBtn = $(".new-note");
+const $noteList = $(".list-container .list-group");
 
 // activeNote is used to keep track of the note in the textarea
 var activeNote = {};
-var draftNote = {
-  text: "",
-  title: ""
+var draftNote = {};
+var $selectedListItem;
+
+// a function to tell me if the actieNote is a draft
+var activeNoteIsADraft = () => {
+  // return (!activeNote.id && ((activeNote.title && activeNote.title.trim()) || (activeNote.text && activeNote.text.trim())))
+  return (!activeNote.id);
+};
+
+var activeNoteHasContent = () => {
+  return ((activeNote.title && activeNote.title.trim()) || (activeNote.text && activeNote.text.trim()))
+};
+
+// a function to return the current active list group item
+var getActiveListItem = () => {
+  return $noteList.children(".active");
+}
+
+var getDraftListItem = () => {
+  return $noteList.children(".draft");
+}
+
+var toggleSelected = ($currentSelection) => {
+  getActiveListItem().removeClass("active");
+  $currentSelection.addClass("active");
 };
 
 // A function for getting all notes from the db
@@ -38,24 +60,32 @@ var deleteNote = function (id) {
 
 // If there is an activeNote, display it, otherwise render empty inputs
 var renderActiveNote = function () {
-  console.log("renderActiveNote", activeNote, draftNote);
-  
-    // $saveNoteBtn.hide();
-    handleRenderSaveBtn();
-
-
-  if (activeNote.id) {
+  console.log("renderActiveNote", activeNote);
+  let isDraft = activeNoteIsADraft();
+  let hasContent = activeNoteHasContent();
+  if (isDraft && hasContent) {
+    console.log("activeNote is a draft and it has content");
+    $saveNoteBtn.show();
+    getDraftListItem().show();
+    $noteTitle.val(activeNote.title || "");
+    $noteText.val(activeNote.text || "")
+  } else {
+    $saveNoteBtn.hide();
+  }
+  if (!isDraft) {
+    console.log("activeNote has an id")
     $noteTitle.attr("readonly", true);
     $noteText.attr("readonly", true);
     $noteTitle.val(activeNote.title);
     $noteText.val(activeNote.text);
   } else {
+    console.log("activeNote doesn't have an id");
     $noteTitle.attr("readonly", false);
     $noteText.attr("readonly", false);
-    // $noteTitle.val("");
-    $noteTitle.val(draftNote.title)
-    // $noteText.val("");
-    $noteText.val(draftNote.text);
+    if (!hasContent) {
+      $noteTitle.val("");
+      $noteText.val("");
+    }
   }
 };
 
@@ -65,7 +95,8 @@ var handleNoteSave = function () {
     title: $noteTitle.val(),
     text: $noteText.val()
   };
-
+  draftNote = {};
+  getDraftListItem().removeData().addClass("disabled");
   saveNote(newNote).then(function (data) {
     getAndRenderNotes();
     renderActiveNote();
@@ -76,23 +107,26 @@ var handleNoteSave = function () {
 var handleNoteDelete = function (event) {
   // prevents the click listener for the list from being called when the button inside of it is clicked
   event.stopPropagation();
-  var $thisNote = $(this).parent(".list-group-item")
+  var $thisNote = $(this).parent(".list-group-item");
   var note = $thisNote.data();
-
-  if (!note.id) {
-    draftNote = {
-      "title": "",
-      "text": ""
-    };
-    $thisNote.data(draftNote);
-    $thisNote.hide();
-    return;
-  }
 
   if (activeNote.id === note.id) {
     activeNote = {};
   }
-
+  if ($thisNote.hasClass("draft")) {
+    console.log("this note is a draft");
+    $thisNote.hide();
+    $thisNote.removeData();
+    if (!$thisNote.hasClass("active")) {
+      let activeListItem = getActiveListItem();
+      if (activeListItem.length == 1) {
+        activeNote = activeListItem.data();
+      }
+    }
+    // activeNote = {}
+    renderActiveNote();
+    return;
+  }
   deleteNote(note.id).then(function () {
     getAndRenderNotes();
     renderActiveNote();
@@ -102,49 +136,41 @@ var handleNoteDelete = function (event) {
 // Sets the activeNote and displays it
 var handleNoteView = function () {
   $this = $(this);
-  if ($this.hasClass("draft")) {
-    draftNote = $this.data();
-    activeNote = {};
-  } else {
-    activeNote = $this.data();
+  if (activeNoteIsADraft()) {
+    draftNote = {
+      title: $noteTitle.val(),
+      text: $noteText.val()
+    }
+    getDraftListItem().data(draftNote);
   }
-  if (!$this.hasClass("active")) {
-    $("li.list-group-item.list-group-item-action.active").removeClass("active");
-    $this.addClass("active");
-  }
-  if ($this.hasClass("draft")) {
-
-  }
+  toggleSelected($this);
+  activeNote = $this.data();
   renderActiveNote();
 };
 
 // Sets the activeNote to and empty object and allows the user to enter a new note
 var handleNewNoteView = function () {
-  $draftNote = $("li.list-group-item.list-group-item-action.draft").show();
-  if (!$draftNote.hasClass("active")) {
-    $("li.list-group-item.list-group-item-action.active").removeClass("active");
-    $draftNote.addClass("active");
+  var $draftListItem = getDraftListItem();
+  toggleSelected($draftListItem);
+  $draftListItem.show();
+  if (!$.isEmptyObject($draftListItem.data())) {
+    activeNote = $draftListItem.data();
+  } else {
+    activeNote = {};
   }
-  draftNote = {"title": "", "text": ""};
-  activeNote = {};
-  $draftNote.children("span").text = "Draft";
   renderActiveNote();
 };
 
 // If a note's title or text are empty, hide the save button
 // Or else show it
-var handleRenderSaveBtn = function () {
-  if (!$.isEmptyObject(activeNote) || !$noteTitle.val().trim() || !$noteText.val().trim()) {
+var handleRenderSaveBtn = () => {
+  let $draftListItem = getDraftListItem();
+  if (!$noteTitle.val().trim() && !$noteText.val().trim()) {
     $saveNoteBtn.hide();
+    $draftListItem.addClass("disabled");
   } else {
     $saveNoteBtn.show();
-    $draft = 
-    $("li.list-group-item.list-group-item-action.draft").show();
-    draftNote.title = $noteTitle.val();
-    // activeNote.title = $noteTitle.val();
-    draftNote.text = $noteText.val();
-    // activeNote.text = $noteText.val();
-    $draft.data(draftNote);
+    $draftListItem.removeClass("disabled");
   }
 };
 
@@ -154,28 +180,28 @@ var renderNoteList = function (notes) {
 
   var noteListItems = [];
   var $li, $span, $delBtn;
-
   for (var i = 0; i < notes.length; i++) {
     var note = notes[i];
 
     $li = $("<li class='list-group-item list-group-item-action'>").data(note);
     $span = $("<span>").text(note.title);
-    $delBtn = $(
-      "<i class='fas fa-trash-alt float-right text-danger delete-note'>"
-    );
-
+    $delBtn = $("<i class='fas fa-trash-alt float-right text-danger delete-note'>");
     $li.append($span, $delBtn);
     noteListItems.push($li);
   }
+  if ((draftNote.text && draftNote.text.trim()) || (draftNote.title && draftNote.title.trim())) {
+      $li = $("<li class='list-group-item list-group-item-action text-danger draft'>").data(draftNote)
+  }
+  else {
+      $li = $("<li class='list-group-item list-group-item-action text-danger draft disabled'>").data(draftNote)
 
-  $li = $("<li class='list-group-item list-group-item-action text-danger draft'>").data(draftNote).hide();
+  }
   $span = $("<span>").text("Draft");
   $delBtn = $("<i class='fas fa-trash-alt float-right text-danger delete-note'>");
   $li.append($span, $delBtn);
   noteListItems.push($li);
-
   $noteList.append(noteListItems);
-
+  console.log("draft item data:", $li.data());
 };
 
 // Gets notes from the db and renders them to the sidebar
