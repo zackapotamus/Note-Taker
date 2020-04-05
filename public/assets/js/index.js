@@ -15,6 +15,13 @@ var getNotes = function() {
   });
 };
 
+function toggleSelected($listNode) {
+  if (!$listNode.hasClass("active")) {
+    $noteList.children(".active").removeClass("active");
+    $listNode.addClass("active");
+  }
+}
+
 // A function for saving a note to the db
 var saveNote = function(note) {
   return $.ajax({
@@ -83,12 +90,15 @@ var handleNoteDelete = function(event) {
 
 // Sets the activeNote and displays it
 var handleNoteView = function() {
-  activeNote = $(this).data();
+  $this = $(this);
+  toggleSelected($this);
+  activeNote = $this.data();
   renderActiveNote();
 };
 
 // Sets the activeNote to and empty object and allows the user to enter a new note
 var handleNewNoteView = function() {
+  $noteList.children(".active").removeClass("active");
   activeNote = {};
   renderActiveNote();
 };
@@ -112,7 +122,8 @@ var renderNoteList = function(notes) {
   for (var i = 0; i < notes.length; i++) {
     var note = notes[i];
 
-    var $li = $("<li class='list-group-item'>").data(note);
+    var $li = $("<li class='list-group-item list-group-item-action'>").data(note);
+    if (note.id === activeNote.id) $li.addClass("active");
     var $span = $("<span>").text(note.title);
     var $delBtn = $(
       "<i class='fas fa-trash-alt float-right text-danger delete-note'>"
