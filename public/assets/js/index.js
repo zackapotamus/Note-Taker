@@ -15,7 +15,7 @@ var getNotes = function() {
   });
 };
 
-function toggleSelected($listNode) {
+function selectItem($listNode) {
   if (!$listNode.hasClass("active")) {
     $noteList.children(".active").removeClass("active");
     $listNode.addClass("active");
@@ -91,7 +91,7 @@ var handleNoteDelete = function(event) {
 // Sets the activeNote and displays it
 var handleNoteView = function() {
   $this = $(this);
-  toggleSelected($this);
+  selectItem($this);
   activeNote = $this.data();
   renderActiveNote();
 };
